@@ -1,50 +1,96 @@
-# Welcome to your Expo app 👋
+# Blazt - Ride Sharing App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native ride-sharing application built with Expo, featuring real-time location tracking, driver management, and interactive maps.
 
-## Get started
+## Features
 
-1. Install dependencies
+- 🗺️ Real-time location tracking
+- 🚗 Driver management with mock data
+- 📍 Interactive Google Maps integration
+- 🔄 Dynamic location updates
+- 🎯 Nearest driver calculation
+- 📱 Modern UI with Tailwind CSS
 
+## Setup
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- Expo CLI
+- Google Maps API Key
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
+3. **Configure Google Maps API Key**
 
+   Create a `.env.local` file in the root directory and add your Google Maps API key:
+   ```
+   EXPO_PUBLIC_GOOGLE_API_KEY=your_google_maps_api_key_here
+   ```
+
+   **To get a Google Maps API key:**
+   1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+   2. Create a new project or select existing one
+   3. Enable the following APIs:
+      - Maps SDK for Android
+      - Maps SDK for iOS
+      - Geocoding API
+      - Places API
+   4. Create credentials (API Key)
+   5. Add the API key to your `.env.local` file
+
+4. Start the development server:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+5. Scan the QR code with Expo Go app
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Environment Variables
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Required environment variables in `.env.local`:
 
-## Get a fresh project
+- `EXPO_PUBLIC_GOOGLE_API_KEY` - Google Maps API key for map functionality
 
-When you're ready, run:
+## Project Structure
 
-```bash
-npm run reset-project
+```
+blazt/
+├── app/                    # Expo Router app directory
+│   ├── (auth)/            # Authentication screens
+│   ├── (tabs)/            # Main app tabs
+│   └── _layout.tsx        # Root layout
+├── components/            # Reusable components
+├── lib/                   # Utility functions
+├── store/                 # Zustand state management
+├── types/                 # TypeScript type definitions
+└── constants/             # App constants
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Technologies Used
 
-## Learn more
+- **React Native** - Mobile app framework
+- **Expo** - Development platform
+- **Expo Router** - File-based routing
+- **Zustand** - State management
+- **React Native Maps** - Map integration
+- **Expo Location** - Location services
+- **Tailwind CSS** - Styling
+- **TypeScript** - Type safety
 
-To learn more about developing your project with Expo, look at the following resources:
+## Troubleshooting
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Map Not Rendering
+- Ensure `EXPO_PUBLIC_GOOGLE_API_KEY` is set in `.env.local`
+- Check that Google Maps APIs are enabled in Google Cloud Console
+- Verify the API key has proper permissions
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Location Permissions
+- The app will request location permissions on first use
+- Ensure location services are enabled on your device
