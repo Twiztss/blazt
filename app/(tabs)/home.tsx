@@ -169,7 +169,7 @@ export default function Page() {
         <ScrollView className="flex-1 w-full rounded-t-2xl -mt-6 p-5 gap-6" contentContainerStyle={{ gap: 24, paddingBottom: 32 }}>
           <GoogleMapView />
           <View className="gap-4">
-            <Text className="text-lg font-semibold mb-1 left-3">Services</Text>
+            <Text className="text-lg font-semibold mb-1">Services</Text>
             {/* Service Types */}
             <View className="flex-row justify-around mb-4">
               {SERVICES.map((service : Service) => (
@@ -184,7 +184,7 @@ export default function Page() {
             </View>
           </View>
           <View className="gap-2">
-            <Text className="text-lg font-semibold mb-1 left-3">History</Text>
+            <Text className="text-lg font-semibold mb-1">History</Text>
             {users.length === 0 ? (
               <View className="items-center justify-center mt-4">
                 <IconSymbol name="malaysianringgitsign.gauge.chart.lefthalf.righthalf" color="darkgray" size={64} />

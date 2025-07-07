@@ -7,13 +7,14 @@ import {
 } from "@/lib/map";
 import { useDriverStore, useLocationStore } from "@/store";
 import * as Location from "expo-location";
+import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Keyboard, Text, View } from "react-native";
 import MapView, { Marker, PROVIDER_DEFAULT, Region } from "react-native-maps";
 import { GoogleTextInput } from "./GoogleTextInput";
 import { IconSymbol } from "./ui/IconSymbol";
 
-// Default region (Bangkok, Thailand)
+// Default region
 const DEFAULT_REGION: Region = {
   latitude: 13.7563,
   longitude: 100.5018,
@@ -176,23 +177,74 @@ export default function MapScreen() {
     hasApiKey: !!process.env.EXPO_PUBLIC_GOOGLE_API_KEY
   });
 
-  const handleSearch = async () => {
+    const handleSearch = async () => {
     if (!search) return;
     
-    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
+    const apiKey = process.env.EXPO_PUBLIC_GEOAPIFY_KEY;
     if (!apiKey) {
-      setErrorMsg('Google Maps API key is not configured');
+      setErrorMsg('Geoapify API key is not configured');
       return;
     }
     
+    console.log('Map: Starting geocoding search for:', search);
+    console.log('Map: Using API key:', apiKey ? 'Present' : 'Missing');
+    
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(search)}&key=${apiKey}`
-      );
-      const data = await response.json();
+      const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(search)}&apiKey=${apiKey}&format=json&limit=5`;
+      console.log('Map: Making request to:', url);
       
-      if (data.status === 'OK' && data.results.length > 0) {
-        const { lat, lng } = data.results[0].geometry.location;
+      const response = await fetch(url);
+      
+      console.log('Map: Response status:', response.status);
+      console.log('Map: Response ok:', response.ok);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Map: HTTP error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Map: API response data:', JSON.stringify(data, null, 2));
+      console.log('Map: Response type:', typeof data);
+      console.log('Map: Response keys:', Object.keys(data));
+      
+      // Check different possible response structures
+      let features = null;
+      if (data.features) {
+        features = data.features;
+        console.log('Map: Found features in data.features:', features.length);
+      } else if (data.results) {
+        features = data.results;
+        console.log('Map: Found results in data.results:', features.length);
+      } else if (Array.isArray(data)) {
+        features = data;
+        console.log('Map: Response is direct array:', features.length);
+      }
+      
+      if (features && features.length > 0) {
+        console.log('Map: Found features/results:', features.length);
+        const feature = features[0];
+        console.log('Map: First feature:', JSON.stringify(feature, null, 2));
+        
+        // Handle different coordinate formats
+        let lat, lng;
+        if (feature.geometry && feature.geometry.coordinates) {
+          [lng, lat] = feature.geometry.coordinates;
+          console.log('Map: Extracted coordinates from geometry:', { lat, lng });
+        } else if (feature.lat && feature.lon) {
+          lat = feature.lat;
+          lng = feature.lon;
+          console.log('Map: Extracted coordinates from lat/lon:', { lat, lng });
+        } else if (feature.latitude && feature.longitude) {
+          lat = feature.latitude;
+          lng = feature.longitude;
+          console.log('Map: Extracted coordinates from latitude/longitude:', { lat, lng });
+        } else {
+          console.error('Map: No coordinates found in feature');
+          setErrorMsg('No coordinates found in location data');
+          return;
+        }
         
         // Update destination in store
         const { setDestinationLocation } = useLocationStore.getState();
@@ -207,12 +259,18 @@ export default function MapScreen() {
           mapRef.current.animateToRegion(newRegion, 1000);
         }
         Keyboard.dismiss();
+        
+        // Redirect to find-ride screen
+        router.push('/find-ride');
       } else {
-        setErrorMsg(`Location not found: ${data.status}`);
+        console.log('Map: No features/results found in response');
+        console.log('Map: Response structure:', Object.keys(data));
+        setErrorMsg('Location not found - no results returned');
       }
     } catch (err) {
       console.error('Map: Geocoding error:', err);
-      setErrorMsg('Failed to fetch location');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setErrorMsg(`Failed to fetch location: ${errorMessage}`);
     }
   };
 
@@ -233,7 +291,7 @@ export default function MapScreen() {
 
   return (
     <View className="bg-white rounded-lg overflow-hidden">
-      <Text className="text-lg font-semibold mb-1 left-3">Current Location</Text>
+      <Text className="text-lg font-semibold mb-1">Current Location</Text>
       {/* Search Input */}
       <View className="border-b border-gray-100">
         <GoogleTextInput
