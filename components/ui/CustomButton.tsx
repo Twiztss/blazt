@@ -33,7 +33,7 @@ const getTextVariant = (variant: string) => {
     }
 }
 
-const CustomButton = ({ onPress, title, bgVariant, textVariant, className, style } : buttonProps) => {
+const CustomButton = ({ onPress, title, bgVariant, textVariant, className, style, disabled } : buttonProps) => {
 
     const bv = bgVariant ? getBgVariant(bgVariant) : ""
     const tv = textVariant ? getTextVariant(textVariant) : "" 
@@ -42,7 +42,8 @@ const CustomButton = ({ onPress, title, bgVariant, textVariant, className, style
     <TouchableOpacity
         onPress={onPress}
         style={style}
-        className={`w-full rounded-full flex items-center justify-center shadow-md shadow-neutral-400/70 ${bv} ${className}`}
+        className={`w-full rounded-full flex items-center justify-center shadow-md shadow-neutral-400/70 ${bv} ${className} ${disabled ? 'opacity-50' : ''}`}
+        disabled={disabled}
     >
         <Text className={`text-xl px-6 py-4 ${tv}`}>{title}</Text>
     </TouchableOpacity>

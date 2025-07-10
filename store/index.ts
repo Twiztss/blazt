@@ -102,3 +102,6 @@ export const useDriverStore = create<DriverStore>((set, get) => ({
     
     clearDriverError: () => set({ driverError: null }),
 }))
+
+// Export message store
+export { useMessageStore } from './messageStore'

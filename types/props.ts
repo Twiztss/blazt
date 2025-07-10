@@ -10,6 +10,7 @@ export type buttonProps = {
     iconRight? : React.ComponentType<any>,
     style? : Object, 
     className? : string,
+    disabled?: boolean,
 }
 
 export enum KeyboardTypeEnum {
